@@ -2273,4 +2273,5 @@
     <apn carrier="Vivo MMS" mcc="724" mnc="001" apn="mms.vivo.com.br" user="vivo" password="vivo" mmsc="http://termnat.vivomms.com.br:8088/mms" mmsproxy="200.142.130.104" mmsport="80" authtype="1" protocol="IPV4V6" type="mms" />
     <apn carrier="Vivo MMS" mcc="724" mnc="19" apn="mms.vivo.com.br" user="vivo" password="vivo" mmsc="http://termnat.vivomms.com.br:8088/mms" mmsproxy="200.142.130.104" mmsport="80" authtype="1" protocol="IPV4V6" type="mms" />
     <apn carrier="Vivo MMS" mcc="724" mnc="019" apn="mms.vivo.com.br" user="vivo" password="vivo" mmsc="http://termnat.vivomms.com.br:8088/mms" mmsproxy="200.142.130.104" mmsport="80" authtype="1" protocol="IPV4V6" type="mms" />
+    <apn carrier="uqmobile.jp" mcc="440" mnc="51" apn="uqmobile.jp" user="uq@uqmobile.jp" password="uq" mmsc="http://mms.ezweb.ne.jp/MMS" mmsproxy="" mmsport="80" authtype="1" protocol="IPV4V6" type="mms" />
 </apns>
