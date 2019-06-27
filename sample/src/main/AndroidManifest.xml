@@ -69,11 +69,11 @@
         </receiver>
 
         <receiver
-            android:name="com.klinker.android.send_message.MmsSentReceiver"
+            android:name="com.klinker.android.messaging_sample.MmsSentReceiver"
             android:taskAffinity="com.klinker.android.messaging.MMS_SENT"/>
 
         <receiver
-            android:name="com.klinker.android.send_message.MmsReceivedReceiver"
+            android:name="com.klinker.android.messaging_sample.MmsReceivedReceiver"
             android:taskAffinity="com.klinker.android.messaging.MMS_RECEIVED"/>
 
         <service
