@@ -20,6 +20,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
+import com.access_company.android.mms.MmsLogger;
+
 public class MmsReceivedReceiver extends BroadcastReceiver {
     public static final String MMS_RECEIVED = "com.klinker.android.messaging.MMS_RECEIVED";
     public static final String EXTRA_FILE_PATH = "file_path";
@@ -29,6 +31,12 @@ public class MmsReceivedReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        MmsLogger.i(String.format("MmsReceivedReceiver#onReceive() start MmsReceivedService uri=%s, location=%s, byPush=%s, filePath=%s",
+                intent.getParcelableExtra(MmsReceivedReceiver.EXTRA_URI),
+                intent.getStringExtra(EXTRA_LOCATION_URL),
+                intent.getBooleanExtra(MmsReceivedReceiver.EXTRA_TRIGGER_PUSH, false),
+                intent.getStringExtra(EXTRA_FILE_PATH)));
+
         // override this class if you want to start other service.
         intent.setClass(context, MmsReceivedService.class);
         context.startService(intent);

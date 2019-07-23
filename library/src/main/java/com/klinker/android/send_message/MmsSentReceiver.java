@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.provider.Telephony;
 
+import com.access_company.android.mms.MmsLogger;
 import com.google.android.mms.util_alt.SqliteWrapper;
 import com.klinker.android.logger.Log;
 
@@ -38,6 +39,10 @@ public class MmsSentReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        MmsLogger.i(String.format("MmsSentReceiver#onReceive() uri=%s, filePath=%s",
+                intent.getStringExtra(EXTRA_CONTENT_URI),
+                intent.getStringExtra(EXTRA_FILE_PATH)
+        ));
         Log.v(TAG, "MMS has finished sending, marking it as so in the database");
 
         Uri uri = Uri.parse(intent.getStringExtra(EXTRA_CONTENT_URI));
@@ -51,6 +56,7 @@ public class MmsSentReceiver extends BroadcastReceiver {
         String filePath = intent.getStringExtra(EXTRA_FILE_PATH);
         Log.v(TAG, filePath);
         new File(filePath).delete();
+        MmsLogger.i("MmsSentReceiver#onReceive() update finihsed");
     }
 
 }

@@ -42,6 +42,7 @@ import android.provider.Telephony.MmsSms.PendingMessages;
 import android.text.TextUtils;
 import android.widget.Toast;
 
+import com.access_company.android.mms.MmsLogger;
 import com.android.mms.logs.LogTag;
 import com.android.mms.service_alt.DownloadRequest;
 import com.android.mms.service_alt.MmsNetworkManager;
@@ -206,6 +207,7 @@ public class TransactionService extends Service implements Observer {
 
     @Override
     public int onStartCommand(final Intent intent, int flags, int startId) {
+        MmsLogger.i("TransactionService#onStartCommand intent=" + intent);
         if (intent != null) {
 //            if (intent.getBooleanExtra(TransactionBundle.LOLLIPOP_RECEIVING, false)) {
 //                lollipopReceiving = true;
@@ -259,6 +261,7 @@ public class TransactionService extends Service implements Observer {
     }
 
     public void onNewIntent(Intent intent, int serviceId) {
+        MmsLogger.i("TransactionService#onNewIntent intent=" + intent + ", action=" + (intent != null ? intent.getAction() : "null") + ", serviceId=" + serviceId);
         mobileDataEnabled = Utils.isMobileDataEnabled(this);
         mConnMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         if (!mobileDataEnabled) {
@@ -291,11 +294,13 @@ public class TransactionService extends Service implements Observer {
                     if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                         Log.v(TAG, "onNewIntent: cursor.count=" + count + " action=" + action);
                     }
+                    MmsLogger.d("TransactionService#onNewIntent cursor.count=" + count + " action=" + action);
 
                     if (count == 0) {
                         if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                             Log.v(TAG, "onNewIntent: no pending messages. Stopping service.");
                         }
+                        MmsLogger.i("TransactionService#onNewIntent no pending messages. Stopping service.");
                         RetryScheduler.setRetryAlarm(this);
                         stopSelfIfIdle(serviceId);
                         return;
@@ -321,6 +326,7 @@ public class TransactionService extends Service implements Observer {
 
                             if (useSystem) {
                                 try {
+                                    MmsLogger.i("TransactionService#onNewIntent start download message using system method.");
                                     Uri uri = ContentUris.withAppendedId(Mms.CONTENT_URI,
                                             cursor.getLong(columnIndexOfMsgId));
                                     com.android.mms.transaction.DownloadManager.getInstance().
@@ -329,6 +335,7 @@ public class TransactionService extends Service implements Observer {
                                     // can't handle many messages at once.
                                     break;
                                 } catch (MmsException e) {
+                                    MmsLogger.i("TransactionService#onNewIntent failed download message using system method.", e);
                                     e.printStackTrace();
                                 }
                             } else {
@@ -356,6 +363,7 @@ public class TransactionService extends Service implements Observer {
                             Log.v(TAG, "onNewIntent: msgType=" + msgType + " transactionType=" +
                                     transactionType);
                         }
+                        MmsLogger.i("TransactionService#onNewIntent msgType=" + msgType + ", transactionType=" + transactionType);
                         if (noNetwork) {
                             onNetworkUnavailable(serviceId, transactionType);
                             return;
@@ -381,12 +389,14 @@ public class TransactionService extends Service implements Observer {
                                                 isTransientFailure(failureType) + " autoDownload=" +
                                                 autoDownload);
                                     }
+                                    MmsLogger.i("TransactionService#onNewIntent failureType=" + failureType + " action=" + action + " isTransientFailure:" + isTransientFailure(failureType) + " autoDownload=" + autoDownload);
                                     if (!autoDownload) {
                                         // If autodownload is turned off, don't process the
                                         // transaction.
                                         if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                                             Log.v(TAG, "onNewIntent: skipping - autodownload off");
                                         }
+                                        MmsLogger.i("TransactionService#onNewIntent skipping - autodownload off");
                                         // Re-enable "download" button if auto-download is off
                                         Uri uri = ContentUris.withAppendedId(Mms.CONTENT_URI,
                                                 cursor.getLong(columnIndexOfMsgId));
@@ -406,11 +416,13 @@ public class TransactionService extends Service implements Observer {
                                     if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                                         Log.v(TAG, "onNewIntent: skipping - permanent error");
                                     }
+                                    MmsLogger.i("TransactionService#onNewIntent skipping - permanent error");
                                     break;
                                 }
                                 if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                                     Log.v(TAG, "onNewIntent: falling through and processing");
                                 }
+                                MmsLogger.i("TransactionService#onNewIntent falling through and processing");
                                // fall-through
                             default:
                                 Uri uri = ContentUris.withAppendedId(
@@ -422,6 +434,7 @@ public class TransactionService extends Service implements Observer {
                                 if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                                     Log.v(TAG, "onNewIntent: launchTransaction uri=" + uri);
                                 }
+                                MmsLogger.i("TransactionService#onNewIntent launchTransaction uri=" + uri);
                                 launchTransaction(serviceId, args, false);
                                 break;
                         }
@@ -433,6 +446,7 @@ public class TransactionService extends Service implements Observer {
                 if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                     Log.v(TAG, "onNewIntent: no pending messages. Stopping service.");
                 }
+                MmsLogger.i("TransactionService#onNewIntent no pending messages. Stopping service.");
                 RetryScheduler.setRetryAlarm(this);
                 stopSelfIfIdle(serviceId);
             }
@@ -440,6 +454,7 @@ public class TransactionService extends Service implements Observer {
             if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                 Log.v(TAG, "onNewIntent: launch transaction...");
             }
+            MmsLogger.i("TransactionService#onNewIntent launch transaction...");
             // For launching NotificationTransaction and test purpose.
             TransactionBundle args = new TransactionBundle(intent.getExtras());
             launchTransaction(serviceId, args, noNetwork);
@@ -746,6 +761,7 @@ public class TransactionService extends Service implements Observer {
             if (Log.isLoggable(LogTag.TRANSACTION, Log.VERBOSE)) {
                 Log.v(TAG, "Handling incoming message: " + msg + " = " + decodeMessage(msg));
             }
+            MmsLogger.i("TransactionService.ServiceHandler#onHandleMessage() message=" + decodeMessage(msg) + "(" + msg + ")");
 
             Transaction transaction = null;
 
