@@ -91,6 +91,10 @@
             </intent-filter>
         </service>
 
+        <service
+            android:name="com.klinker.android.send_message.MmsReceivedService"
+            android:exported="false" />
+
         <activity android:name=".PermissionActivity"/>
     </application>
 
