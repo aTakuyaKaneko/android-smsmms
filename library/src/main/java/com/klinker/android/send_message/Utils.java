@@ -1,7 +1,9 @@
 package com.klinker.android.send_message;
 
 import android.annotation.TargetApi;
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.ConnectivityManager;
@@ -15,6 +17,8 @@ import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 
+import com.android.mms.MmsConfig;
+import com.android.mms.MmsConfig.ForegroundNotificationFactory;
 import com.android.mms.service_alt.MmsNetworkManager;
 import com.android.mms.service_alt.exception.MmsNetworkException;
 import com.google.android.mms.util_alt.SqliteWrapper;
@@ -22,6 +26,7 @@ import com.klinker.android.logger.Log;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -429,6 +434,49 @@ public class Utils {
             return SmsManager.getDefaultSmsSubscriptionId();
         } else {
             return DEFAULT_SUBSCRIPTION_ID;
+        }
+    }
+
+    public static void startService(Context context, Intent intent) {
+        if (MmsConfig.isUseForegroundService() && Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            // Call startForegroundService() using reflection because compileSdkVersion <= 25.
+            // context.startForegroundService(intent);
+
+            Method method;
+            try {
+                method = context.getClass().getMethod("startForegroundService", Intent.class);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+
+            try {
+                method.invoke(context, intent);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            context.startService(intent);
+        }
+    }
+
+    public static void startForeground(Service service) {
+        if (!MmsConfig.isUseForegroundService() || Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+            return;
+        }
+
+        ForegroundNotificationFactory factory = MmsConfig.getForegroundNotificationFactory(service.getClass());
+        if (factory == null) {
+            return;
+        }
+
+        service.startForeground(factory.getId(service), factory.getNotification(service));
+    }
+
+    public static void stopForeground(Service service) {
+        if (MmsConfig.isUseForegroundService() && Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            service.stopForeground(true);
         }
     }
 }

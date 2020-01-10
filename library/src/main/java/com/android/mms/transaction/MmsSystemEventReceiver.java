@@ -48,7 +48,7 @@ public class MmsSystemEventReceiver extends BroadcastReceiver {
                 Log.v(TAG, "wakeUpService: start transaction service ...");
             }
 
-            context.startService(new Intent(context, TransactionService.class));
+            Utils.startService(context, new Intent(context, TransactionService.class));
         }
     }
 

@@ -17,11 +17,15 @@
 package com.android.mms;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.klinker.android.send_message.R;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.app.Notification;
+import android.app.Service;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import com.klinker.android.logger.Log;
@@ -41,6 +45,8 @@ public class MmsConfig {
     private static final int MAX_IMAGE_HEIGHT = 480;
     private static final int MAX_IMAGE_WIDTH = 640;
     private static final int MAX_TEXT_LENGTH = 2000;
+
+    private static final boolean USE_FOREGROUND_SERVICE = false;
 
     /**
      * Whether to hide MMS functionality from the user (i.e. SMS only).
@@ -109,6 +115,9 @@ public class MmsConfig {
     // If mEnableGroupMms is false, the group MMS setting/preference will be hidden in the settings
     // activity.
     private static boolean mEnableGroupMms = true;
+
+    private static boolean mUseForegroundService = USE_FOREGROUND_SERVICE;
+    private static final Map<Class<? extends Service>, ForegroundNotificationFactory> mForegroundNotificationFactories = new HashMap<>();
 
     public static void init(Context context) {
         if (LOCAL_LOGV) {
@@ -337,4 +346,25 @@ public class MmsConfig {
         MmsConfig.mUaProfTagName = tagName;
     }
 
+    public static boolean isUseForegroundService() {
+        return mUseForegroundService;
+    }
+
+    public static void setUseForegroundService(boolean useForegroundService) {
+        mUseForegroundService = useForegroundService;
+    }
+
+    public interface ForegroundNotificationFactory {
+        int getId(Context context);
+
+        Notification getNotification(Context context);
+    }
+
+    public static ForegroundNotificationFactory getForegroundNotificationFactory(Class<? extends Service> serviceClass) {
+        return mForegroundNotificationFactories.get(serviceClass);
+    }
+
+    public static void putForegroundNotificationFactory(Class<? extends Service> serviceClass, ForegroundNotificationFactory factory) {
+        mForegroundNotificationFactories.put(serviceClass, factory);
+    }
 }

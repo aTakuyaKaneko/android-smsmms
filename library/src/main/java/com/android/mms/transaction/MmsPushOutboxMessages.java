@@ -21,6 +21,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import com.klinker.android.logger.Log;
+import com.klinker.android.send_message.Utils;
 
 /**
  * MmsPushOutboxMessages listens for MMS_SEND_OUTBOX_MSG intent .
@@ -41,7 +42,7 @@ public class MmsPushOutboxMessages extends BroadcastReceiver {
         String action = intent.getAction();
         if(action.equalsIgnoreCase(INTENT_MMS_SEND_OUTBOX_MSG)){
             Log.d(TAG,"Now waking up the MMS service");
-            context.startService(new Intent(context, TransactionService.class));
+            Utils.startService(context, new Intent(context, TransactionService.class));
         }
     }
 

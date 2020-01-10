@@ -181,6 +181,7 @@ public class TransactionService extends Service implements Observer {
 
         if (!Utils.isDefaultSmsApp(this)) {
             Log.v(TAG, "not default app, so exiting");
+            // In this case, there is no need to call stopForeground() because Service is not started
             stopSelf();
             return;
         }
@@ -238,6 +239,7 @@ public class TransactionService extends Service implements Observer {
                 initServiceHandler();
             }
 
+            Utils.startForeground(this);
             Message msg = mServiceHandler.obtainMessage(EVENT_NEW_INTENT);
             msg.arg1 = startId;
             msg.obj = intent;
@@ -272,6 +274,7 @@ public class TransactionService extends Service implements Observer {
 
         if (mConnMgr == null) {
             endMmsConnectivity();
+            Utils.stopForeground(this);
             stopSelf(serviceId);
             return;
         }
@@ -459,6 +462,7 @@ public class TransactionService extends Service implements Observer {
                     Log.v(TAG, "stopSelfIfIdle: STOP!");
                 }
 
+                Utils.stopForeground(this);
                 stopSelf(startId);
             }
         }
@@ -512,6 +516,7 @@ public class TransactionService extends Service implements Observer {
         if (toastType != TOAST_NONE) {
             mToastHandler.sendEmptyMessage(toastType);
         }
+        Utils.stopForeground(this);
         stopSelf(serviceId);
     }
 
@@ -911,6 +916,7 @@ public class TransactionService extends Service implements Observer {
                                 Log.v(TAG, "Transaction was null. Stopping self: " + serviceId);
                             }
                             endMmsConnectivity();
+                            Utils.stopForeground(TransactionService.this);
                             stopSelf(serviceId);
                         }
                     }
@@ -982,6 +988,7 @@ public class TransactionService extends Service implements Observer {
                         }
                     } else {
                         transaction = null;
+                        Utils.stopForeground(TransactionService.this);
                         stopSelf(serviceId);
                     }
                 } catch (IOException e) {
@@ -1147,6 +1154,7 @@ public class TransactionService extends Service implements Observer {
                                 com.klinker.android.send_message.Transaction.MMS_ERROR);
                         mServiceHandler.markAllPendingTransactionsAsFailed();
                         endMmsConnectivity();
+                        Utils.stopForeground(TransactionService.this);
                         stopSelf();
                         return;
                     }

@@ -30,6 +30,7 @@ import android.telephony.SmsMessage;
 import com.klinker.android.logger.Log;
 
 import com.android.mms.logs.LogTag;
+import com.klinker.android.send_message.Utils;
 
 /**
  * Service that gets started by the MessageStatusReceiver when a message status report is
@@ -51,19 +52,24 @@ public class MessageStatusService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         // This method is called on a worker thread.
+        Utils.startForeground(this);
 
-        String messageUri = intent.getDataString();
-        if (messageUri == null) {
-            messageUri = intent.getStringExtra("message_uri");
+        try {
+            String messageUri = intent.getDataString();
             if (messageUri == null) {
-                return;
+                messageUri = intent.getStringExtra("message_uri");
+                if (messageUri == null) {
+                    return;
+                }
             }
+
+            byte[] pdu = intent.getByteArrayExtra("pdu");
+            String format = intent.getStringExtra("format");
+
+            SmsMessage message = updateMessageStatus(this, Uri.parse(messageUri), pdu, format);
+        } finally {
+            Utils.stopForeground(this);
         }
-
-        byte[] pdu = intent.getByteArrayExtra("pdu");
-        String format = intent.getStringExtra("format");
-
-        SmsMessage message = updateMessageStatus(this, Uri.parse(messageUri), pdu, format);
     }
 
     private SmsMessage updateMessageStatus(Context context, Uri messageUri, byte[] pdu,

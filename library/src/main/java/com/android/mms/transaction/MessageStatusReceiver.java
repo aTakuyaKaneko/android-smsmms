@@ -20,6 +20,9 @@ package com.android.mms.transaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+
+import com.klinker.android.send_message.Utils;
 
 public class MessageStatusReceiver extends BroadcastReceiver {
     public static final String MESSAGE_STATUS_RECEIVED_ACTION =
@@ -29,7 +32,7 @@ public class MessageStatusReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (MESSAGE_STATUS_RECEIVED_ACTION.equals(intent.getAction())) {
             intent.setClass(context, MessageStatusService.class);
-            context.startService(intent);
+            Utils.startService(context, intent);
        }
     }
 }

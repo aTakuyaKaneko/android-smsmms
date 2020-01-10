@@ -39,6 +39,7 @@ import com.google.android.mms.pdu_alt.PduPersister;
 import com.google.android.mms.pdu_alt.ReadRecInd;
 import com.google.android.mms.pdu_alt.SendReq;
 import com.google.android.mms.util_alt.SqliteWrapper;
+import com.klinker.android.send_message.Utils;
 
 public class MmsMessageSender implements MessageSender {
     private static final String TAG = LogTag.TAG;
@@ -122,7 +123,7 @@ public class MmsMessageSender implements MessageSender {
         // Start MMS transaction service
         try {
             SendingProgressTokenManager.put(messageId, token);
-            mContext.startService(new Intent(mContext, TransactionService.class));
+            Utils.startService(mContext, new Intent(mContext, TransactionService.class));
         } catch (Exception e) {
             throw new MmsException("transaction service not registered in manifest");
         }
@@ -176,7 +177,7 @@ public class MmsMessageSender implements MessageSender {
             }
             PduPersister.getPduPersister(context).persist(readRec, Mms.Outbox.CONTENT_URI, true,
                     group, null);
-            context.startService(new Intent(context, TransactionService.class));
+            Utils.startService(context, new Intent(context, TransactionService.class));
         } catch (InvalidHeaderValueException e) {
             Log.e(TAG, "Invalide header value", e);
         } catch (MmsException e) {
