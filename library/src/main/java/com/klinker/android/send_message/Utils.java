@@ -439,6 +439,7 @@ public class Utils {
 
     public static void startService(Context context, Intent intent) {
         if (MmsConfig.isUseForegroundService() && Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            android.util.Log.d("__debug__", "Utils#startService() (isUseForegroundActivity and version >= O) service=" + intent.getComponent().getClassName());
             // Call startForegroundService() using reflection because compileSdkVersion <= 25.
             // context.startForegroundService(intent);
 
@@ -446,28 +447,35 @@ public class Utils {
             try {
                 method = context.getClass().getMethod("startForegroundService", Intent.class);
             } catch (NoSuchMethodException e) {
+                android.util.Log.d("__debug__", "Utils#startService() (getClass() exception) service=" + intent.getComponent().getClassName(), e);
                 throw new RuntimeException(e);
             }
 
             try {
                 method.invoke(context, intent);
             } catch (IllegalAccessException e) {
+                android.util.Log.d("__debug__", "Utils#startService() (invoke() exception1) service=" + intent.getComponent().getClassName(), e);
                 throw new RuntimeException(e);
             } catch (InvocationTargetException e) {
+                android.util.Log.d("__debug__", "Utils#startService() (invoke() exception2) service=" + intent.getComponent().getClassName(), e);
                 throw new RuntimeException(e);
             }
         } else {
+            android.util.Log.d("__debug__", "Utils#startService() (!isUseForegroundActivity or version < O) service=" + intent.getComponent().getClassName());
             context.startService(intent);
         }
     }
 
     public static void startForeground(Service service) {
+        android.util.Log.d("__debug__", "Utils#startForeground() service=[" + Integer.toHexString(service.hashCode()) + "]" + service.getClass().getCanonicalName());
         if (!MmsConfig.isUseForegroundService() || Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
+            android.util.Log.d("__debug__", "Utils#startForeground() (!isUseForegroundActivity or version < O) service=[" + Integer.toHexString(service.hashCode()) + "]" + service.getClass().getCanonicalName());
             return;
         }
 
         ForegroundNotificationFactory factory = MmsConfig.getForegroundNotificationFactory(service.getClass());
         if (factory == null) {
+            android.util.Log.d("__debug__", "Utils#startForeground() (factory is null) service=[" + Integer.toHexString(service.hashCode()) + "]" + service.getClass().getCanonicalName());
             return;
         }
 
@@ -475,8 +483,11 @@ public class Utils {
     }
 
     public static void stopForeground(Service service) {
+        android.util.Log.d("__debug__", "Utils#stopForeground() service=[" + Integer.toHexString(service.hashCode()) + "]" + service.getClass().getCanonicalName());
         if (MmsConfig.isUseForegroundService() && Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
             service.stopForeground(true);
+        } else {
+            android.util.Log.d("__debug__", "Utils#stopForeground() (!isUseForegroundActivity or version < O) service=[" + Integer.toHexString(service.hashCode()) + "]" + service.getClass().getCanonicalName());
         }
     }
 }
